@@ -26,7 +26,7 @@ export function useSearchSuperheros(params: Params) {
     queryFn: superheroName
       ? async () => {
           const response: ResponseSuccess<ResponsePayload> = await fetch(
-            `${config.apiHost}/api/${config.apiToken}/search/${superheroName}`,
+            `${config.apiHost}/api/${config.apiToken}h/search/${superheroName}`,
             {
               headers: {
                 'Content-Type': 'application/json',

@@ -1,11 +1,11 @@
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { superheroApi } from '~entities/superhero';
 import { useDebounce } from '~shared/useDebounce';
 
 export function HomePage() {
-  const [searchValue, setSearchedValue] = useState('');
+  const [searchValue, setSearchedValue] = useState(localStorage.getItem('last-search') || '');
 
   const debouncedValue = useDebounce(searchValue, 700)
   const { data, isLoading, error } = superheroApi.useSearchSuperheros({
@@ -15,6 +15,10 @@ export function HomePage() {
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     setSearchedValue(e.target.value)
   }
+
+  useEffect(() => {
+    localStorage.setItem('last-search', debouncedValue)
+  }, [debouncedValue])
 
   return (
     <div>
@@ -34,7 +38,7 @@ export function HomePage() {
           Failed to load superhero data.
         </p>
       )}
-      {data?.results.length === 0 && (
+      {data?.results?.length === 0 && (
         <p className="text-center text-gray-500">No superheroes found.</p>
       )}
       {data?.results && data.results.length > 0 && (

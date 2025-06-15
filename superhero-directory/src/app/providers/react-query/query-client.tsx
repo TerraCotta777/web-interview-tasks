@@ -5,7 +5,13 @@ import {
   QueryClientProvider as QueryClientProviderRaw,
 } from '@tanstack/react-query';
 
-export const queryClient = new QueryClient();
+export const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 5 * 60000,
+    },
+  },
+});
 
 export const QueryClientProvider = ({ children }: PropsWithChildren) => {
   return (
