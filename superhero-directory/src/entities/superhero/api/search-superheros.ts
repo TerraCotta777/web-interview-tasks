@@ -1,5 +1,9 @@
 import { config } from '~shared/config';
-import { ResponseError, ResponseSuccess } from '~shared/response';
+import {
+  ResponseError,
+  ResponseSuccess,
+  isResponseError,
+} from '~shared/response';
 
 import { skipToken, useQuery } from '@tanstack/react-query';
 
@@ -25,24 +29,29 @@ export function useSearchSuperheros(params: Params) {
     queryKey: superheroKeys.search(superheroName),
     queryFn: superheroName
       ? async () => {
-          const response: ResponseSuccess<ResponsePayload> = await fetch(
-            `${config.apiHost}/api/${config.apiToken}h/search/${superheroName}`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          ).then(async (res) => {
-            if (!res.ok) {
-              const error: ResponseError = await res.json();
+          const response: ResponseSuccess<ResponsePayload> | ResponseError =
+            await fetch(
+              `${config.apiHost}/api/${config.apiToken}/search/${superheroName}`,
+              {
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              }
+            ).then(async (res) => {
+              if (!res.ok) {
+                const error: ResponseError = await res.json();
 
-              throw new Error(
-                `Error ${res.status}: ${res.statusText} - ${error.error}`
-              );
-            }
+                throw new Error(
+                  `Error ${res.status}: ${res.statusText} - ${error.error}`
+                );
+              }
 
-            return res.json();
-          });
+              return res.json();
+            });
+
+          if (isResponseError(response)) {
+            throw new Error(`Error: ${response.error}`);
+          }
 
           return response;
         }
