@@ -1,14 +1,20 @@
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import { superheroApi } from '~entities/superhero';
+import { useDebounce } from '~shared/useDebounce';
 
 export function HomePage() {
   const [searchValue, setSearchedValue] = useState('');
 
+  const debouncedValue = useDebounce(searchValue, 700)
   const { data, isLoading, error } = superheroApi.useSearchSuperheros({
-    query: searchValue,
+    query: debouncedValue,
   });
+
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setSearchedValue(e.target.value)
+  }
 
   return (
     <div>
@@ -20,7 +26,7 @@ export function HomePage() {
       <input
         className="border"
         value={searchValue}
-        onChange={(e) => setSearchedValue(e.target.value)}
+        onChange={handleChange}
       />
       {isLoading && <p className="text-center text-gray-500">Loading...</p>}
       {error && !data && (
